@@ -1,0 +1,3 @@
+[DEFAULT]
+Path = %Your pictures directory here.%
+Token = %Your bot token.%
