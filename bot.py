@@ -6,6 +6,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_polling
+from ftplib import FTP
 
 files = getfiles()
 count = 0
@@ -38,6 +39,12 @@ async def start(message: types.Message):
         await asyncio.sleep(wait_to_Friday(find_Friday()))
         await run(message.chat.id)
 
+@dp.message_handler(commands=['test'])
+async def start(message: types.Message):
+    with file_to_send_path(files) as photo:
+        await message.reply_photo(photo=photo.read())
+
+
 async def run(chat_id):
     with dp.current_state(chat=chat_id) as state:
         await state.set_state(FRIDAY)
@@ -59,8 +66,7 @@ async def reset_files():
 
 async def send_chicken(chat_id):
     try:
-        path = file_to_send_path(files)
-        with open(path, 'rb') as photo:
+        with file_to_send_path(files) as photo:
             await bot.send_photo(chat_id, photo)
     except:
         pass
@@ -73,8 +79,7 @@ async def chicken_command(message: types.Message):
 @dp.message_handler(state=FRIDAY, regexp='(^chicken[s]?$|^hen[s]?$|^кур|пету[х|ш]|^rooster$|^cock$|^цыпл)') ##
 async def chicken_text(message: types.Message):
     try:
-        path = file_to_send_path(files)
-        with open(path, 'rb') as photo:
+        with file_to_send_path(files) as photo:
             await bot.send_photo(message.chat.id, photo, caption='Did you ask for chickens?',
                                  reply_to_message_id=message.message_id)
     except:

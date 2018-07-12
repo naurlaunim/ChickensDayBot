@@ -1,3 +1,7 @@
 [DEFAULT]
 Path = %Your pictures directory here.%
+FTP = %ftp path%
+FTP_User = %ftp user%
+FTP_Password = %ftp password%
+FTP_Directory = %ftp directory with chickens%
 Token = %Your bot token.%
