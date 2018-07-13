@@ -6,19 +6,23 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+def connect_to_ftp():
+    ftp.connect(config['DEFAULT']['FTP'])
+    ftp.login(user=config['DEFAULT']['FTP_User'], 
+              passwd=config['DEFAULT']['FTP_Password'])
+    ftp.cwd(config['DEFAULT']['FTP_Directory'])
+
+
 usingFTP = False
 if ('FTP' in config['DEFAULT']):
     usingFTP = True
     
     ftp = FTP(config['DEFAULT']['FTP'])
-    ftp.login(user=config['DEFAULT']['FTP_User'], 
-              passwd=config['DEFAULT']['FTP_Password'])
-    ftp.cwd(config['DEFAULT']['FTP_Directory'])
+    connect_to_ftp()
 elif ('Path' in config['DEFAULT']):
     path = config['DEFAULT']['Path']
 
 token = config['DEFAULT']['Token']
-
 
 def getfiles():
     if usingFTP:
@@ -32,6 +36,7 @@ def getfiles():
 def file_to_send_path(files):
     file = files.pop()
     if usingFTP:
+        connect_to_ftp()
         bio = io.BytesIO()
         ftp.retrbinary("RETR %s" % file, bio.write)
         bio.name = file
