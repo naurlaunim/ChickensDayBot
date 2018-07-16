@@ -76,7 +76,7 @@ async def chicken_command(message: types.Message):
     await send_chicken(message.chat.id)
 
 
-@dp.message_handler(state=FRIDAY, regexp='(^chicken[s]?$|^hen[s]?$|^кур|пету[х|ш]|^rooster$|^cock$|^цыпл)') ##
+@dp.message_handler(state=FRIDAY, regexp='\b(chicken[s]?|hen[s]?|кур.*|пету[хш].*|rooster[s]?|cock[s]?|цыпл.*)\b') ##
 async def chicken_text(message: types.Message):
     try:
         with file_to_send_path(files) as photo:
