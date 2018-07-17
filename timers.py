@@ -3,7 +3,6 @@ import datetime
 
 def is_Friday():
     return datetime.date.today().weekday() == 4
-    # return True
 
 def find_Friday():
     today = datetime.date.today()

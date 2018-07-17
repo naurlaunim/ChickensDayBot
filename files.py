@@ -1,6 +1,8 @@
 import os
 from ftplib import FTP
 import io
+import pickle
+import random
 
 import configparser
 config = configparser.ConfigParser()
@@ -27,14 +29,12 @@ token = config['DEFAULT']['Token']
 def getfiles():
     if usingFTP:
         y = ftp.nlst('.')
-        y = [e for e in y if e not in ('.', '..')]
-        return set(y)
+        return [e for e in y if e not in ('.', '..')]
 
-    y = os.listdir(path)
-    return set(y)
+    return os.listdir(path)
 
 def file_to_send_path(files):
-    file = files.pop()
+    file = random.choice(files)
     if usingFTP:
         connect_to_ftp()
         bio = io.BytesIO()
@@ -44,6 +44,23 @@ def file_to_send_path(files):
         return bio
     return open(os.path.join(path, file), 'rb')
 
+def get_chats():
+    try:
+        f = open('chats.txt', 'rb')
+        chats = pickle.load(f)
+        f.close()
+    except FileNotFoundError:
+        chats = set()
+    return chats
 
+def add_chat(chat_id):
+    chats = get_chats()
+    chats.add(chat_id)
+    save_chats(chats)
+
+def save_chats(chats):
+    f = open('chats.txt', 'wb')
+    pickle.dump(chats, f)
+    f.close()
 
 
