@@ -19,9 +19,6 @@ def connect_to_ftp():
               passwd=config['FTP']['FTP_Password'])
     ftp.cwd(config['FTP']['FTP_Directory'])
 
-# def connect_to_db():
-
-
 
 usingDB = False
 usingFTP = False
@@ -32,7 +29,6 @@ if 'Database' in config['DATABASE']:
     password = config['DATABASE']['DB_password']
     host = config['DATABASE']['DB_host']
     port = config['DATABASE']['DB_port']
-
 
 elif ('FTP' in config['FTP']):
     usingFTP = True
@@ -66,7 +62,6 @@ def file_to_send(files):
 
 def open_file(file):
     if usingDB:
-        print('use db') ###
         conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
         cur = conn.cursor()
 
@@ -75,7 +70,6 @@ def open_file(file):
         conn.close()
         return file_data
     if usingFTP:
-        print('use ftp') ###
         connect_to_ftp()
         bio = io.BytesIO()
         ftp.retrbinary("RETR %s" % file, bio.write)
