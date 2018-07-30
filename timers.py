@@ -2,7 +2,8 @@ import time
 import datetime
 
 def is_Friday():
-    return datetime.date.today().weekday() == 4
+    # return datetime.date.today().weekday() == 4
+    return datetime.datetime.now().timetuple()[4] >= 30
 
 def find_Friday():
     today = datetime.date.today()

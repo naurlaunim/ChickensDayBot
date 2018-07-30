@@ -1,7 +1,21 @@
 [DEFAULT]
 Path = %Your pictures directory here.%
+Token = %Your bot token.%
+
+[FTP]
 FTP = %ftp path%
 FTP_User = %ftp user%
 FTP_Password = %ftp password%
 FTP_Directory = %ftp directory with chickens%
-Token = %Your bot token.%
+
+[DATABASE]
+Database = postgres
+DB_user = postgres
+DB_password = %your password%
+DB_host = 127.0.0.1
+DB_port = 5432
+
+[TIMEOUTS]
+After_Number = 115
+To_Number = 2
+Timer = 3600

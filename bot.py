@@ -10,9 +10,6 @@ from aiogram.utils.executor import start_polling
 
 chats_files = {}
 chats_count = {}
-after_number = 115 # The number of messages after which there will be chicken.
-to_number = 2 # The number of messages to which there will be no chicken.
-timer = 3600 # The time interval between regular chickens (not chickens for activity). (seconds)
 
 API_TOKEN = token
 
@@ -43,8 +40,8 @@ async def start(message: types.Message):
 @dp.message_handler(commands=['test'])
 async def start(message: types.Message):
     try:
-        with file_to_send_path(chats_files.get(message.chat.id)) as photo:
-            await message.reply_photo(photo=photo.read())
+        with file_to_send(chats_files.get(message.chat.id)) as photo:
+            await message.reply_photo(photo=photo)
     except:
         await message.reply('Something went wrong')
 
@@ -57,7 +54,7 @@ async def run():
     chats_count = {chat: 0 for chat in chats}
     for chat_id in chats:
         with dp.current_state(chat=chat_id) as state:
-            await state.set_state(FRIDAY)  # Maybe not necessary.
+            await state.set_state(FRIDAY)
         await greeting(chat_id)
     while is_Friday():
         chats = get_chats()
@@ -67,6 +64,11 @@ async def run():
                 await send_chicken(chat_id)
                 chats_count[chat_id] = 0
         await asyncio.sleep(timer)
+
+    for chat_id in chats:
+        with dp.current_state(chat=chat_id) as state:
+            await state.set_state(NOT_FRIDAY)
+
     await wait()
 
 async def greeting(chat_id):
@@ -75,7 +77,7 @@ async def greeting(chat_id):
 
 async def send_chicken(chat_id):
     try:
-        with file_to_send_path(chats_files.get(chat_id)) as photo:
+        with file_to_send(chats_files.get(chat_id)) as photo:
             await bot.send_photo(chat_id, photo)
     except:
         pass
@@ -88,7 +90,7 @@ async def chicken_command(message: types.Message):
 @dp.message_handler(state=FRIDAY, regexp='(chicken[s]?|hen[s]?|кур.*|пету[хш].*|rooster[s]?|cock[s]?|цыпл.*)') ##
 async def chicken_text(message: types.Message):
     try:
-        with file_to_send_path(chats_files.get(message.chat.id)) as photo:
+        with file_to_send(chats_files.get(message.chat.id)) as photo:
             await bot.send_photo(message.chat.id, photo, caption='Did you ask for chickens?',
                                  reply_to_message_id=message.message_id)
     except:
@@ -105,11 +107,14 @@ async def state_listen(message: types.Message):
 
 @dp.message_handler(state=FRIDAY)
 async def listen(message: types.Message):
-    global chats_count
-    chats_count[message.chat.id] += 1
-    if chats_count.get(message.chat.id) >= after_number:
-        await send_chicken(message.chat.id)
-        chats_count[message.chat.id] = 0
+    try:
+        global chats_count
+        chats_count[message.chat.id] += 1
+        if chats_count.get(message.chat.id) >= after_number:
+            await send_chicken(message.chat.id)
+            chats_count[message.chat.id] = 0
+    except:
+        pass
 
 async def wait():
     await asyncio.sleep(wait_to_Friday(find_Friday()))
