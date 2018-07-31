@@ -10,12 +10,10 @@ from aiogram.utils.executor import start_polling
 chats_files = {}
 chats_count = {}
 
-API_TOKEN = token
-
 logging.basicConfig(level=logging.INFO)
 
 loop = asyncio.get_event_loop()
-bot = Bot(token=API_TOKEN, loop=loop)
+bot = Bot(token=token, loop=loop)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
