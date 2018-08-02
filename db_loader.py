@@ -37,6 +37,8 @@ def create():
     cur = conn.cursor()
 
     cur.execute("CREATE TABLE Chickens(Id SERIAL PRIMARY KEY, name VARCHAR, picture BYTEA NOT NULL)")
+    cur.execute("CREATE TABLE Chats(list INT NOT NULL PRIMARY KEY, data BYTEA)")
+    cur.execute("INSERT INTO Chats (list) VALUES (1)")
 
     conn.commit()
 

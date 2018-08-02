@@ -6,6 +6,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_polling
+from aiogram.utils.exceptions import Unauthorized
 
 chats_files = {}
 chats_count = {}
@@ -76,8 +77,8 @@ async def send_chicken(chat_id):
     try:
         with file_to_send(chats_files.get(chat_id)) as photo:
             await bot.send_photo(chat_id, photo)
-    except:
-        pass
+    except Unauthorized:
+        del_chat(chat_id)
 
 @dp.message_handler(state='*', commands=['chicken'])
 async def chicken_command(message: types.Message):

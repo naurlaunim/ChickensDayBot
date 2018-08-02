@@ -39,13 +39,18 @@ elif ('Path' in config['DEFAULT']):
     path = config['DEFAULT']['Path']
 
 
-
 token = config['DEFAULT']['Token']
+
+
+def getconnection():
+    conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
+    cur = conn.cursor()
+    return (conn, cur)
+
 
 def getfiles():
     if usingDB:
-        conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
-        cur = conn.cursor()
+        (conn, cur) = getconnection()
         cur.execute("SELECT name FROM Chickens ")
         files = cur.fetchall()
         conn.close()
@@ -62,9 +67,7 @@ def file_to_send(files):
 
 def open_file(file):
     if usingDB:
-        conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
-        cur = conn.cursor()
-
+        (conn, cur) = getconnection()
         cur.execute("SELECT picture FROM Chickens WHERE name = %s", (file,))
         file_data = cur.fetchone()[0]
         conn.close()
@@ -78,7 +81,19 @@ def open_file(file):
         return bio
     return open(os.path.join(path, file), 'rb')
 
+
 def get_chats():
+    if usingDB:
+        (conn, cur) = getconnection()
+        cur.execute("SELECT data FROM Chats WHERE List = 1")
+        data = cur.fetchone()[0]
+        conn.close()
+        try:
+            chats = pickle.loads(data)
+        except:
+            chats = set()
+        return chats
+
     try:
         f = open('chats.txt', 'rb')
         chats = pickle.load(f)
@@ -93,8 +108,20 @@ def add_chat(chat_id):
     save_chats(chats)
 
 def save_chats(chats):
-    f = open('chats.txt', 'wb')
-    pickle.dump(chats, f)
-    f.close()
+    if usingDB:
+        (conn, cur) = getconnection()
+        data = pickle.dumps(chats)
+        cur.execute("UPDATE Chats SET data = %s WHERE list = 1", (data,))
+        conn.commit()
+        conn.close()
+    else:
+        f = open('chats.txt', 'wb')
+        pickle.dump(chats, f)
+        f.close()
+
+def del_chat(chat_id):
+    chats = get_chats()
+    chats.discard(chat_id)
+    save_chats(chats)
 
 
