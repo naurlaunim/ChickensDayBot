@@ -2,6 +2,7 @@ import psycopg2
 from ftplib import FTP
 import io
 import configparser
+import sys
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -14,13 +15,18 @@ port = config['DATABASE']['DB_port']
 
 ftp = FTP(config['FTP']['FTP'])
 
+conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
+print('connected to database')
+
 def connect_to_ftp():
+    print(sys._getframe().f_code.co_name)
     ftp.connect(config['FTP']['FTP'])
     ftp.login(user=config['FTP']['FTP_User'],
               passwd=config['FTP']['FTP_Password'])
     ftp.cwd(config['FTP']['FTP_Directory'])
 
 def getfiles():
+    print(sys._getframe().f_code.co_name)
     y = ftp.nlst('.')
     return [e for e in y if e not in ('.', '..')]
 
@@ -34,6 +40,7 @@ def open_file(file):
 
 
 def create():
+    print(sys._getframe().f_code.co_name)
     cur = conn.cursor()
 
     cur.execute("CREATE TABLE Chickens(Id SERIAL PRIMARY KEY, name VARCHAR, picture BYTEA NOT NULL)")
@@ -44,6 +51,7 @@ def create():
 
 
 def store(file, name):
+    print(sys._getframe().f_code.co_name)
     cur = conn.cursor()
 
     # f = open(path, 'rb')
@@ -72,8 +80,7 @@ def fetch(path, name):
 def main():
     connect_to_ftp()
 
-    conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
-
+    create()
     files = getfiles()
     for file_name in files:
         file = open_file(file_name)
